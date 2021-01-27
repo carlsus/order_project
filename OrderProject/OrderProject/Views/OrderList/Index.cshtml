@@ -1,0 +1,95 @@
+﻿@model IEnumerable<OrderProject.Models.PurchaseOrder>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="text-center text-uppercase">List of Customer</h3>
+<p>
+    @Html.ActionLink("Create New", "Create", "", new { @class = "btn btn-primary" })  
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Customer.Fullname)</th>
+            <th>@Html.DisplayNameFor(m => m.DeliveryDate)</th>
+            <th>@Html.DisplayNameFor(m => m.Status)</th>
+            <th>@Html.DisplayNameFor(m => m.AmountDue)</th>
+            <th>Action(s)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ol in Model)
+        {
+            <tr>
+                <td>@ol.Customer.Fullname</td>
+                <td>@ol.DeliveryDate</td>
+                <td>@ol.Status</td>
+                <td>@ol.AmountDue</td>
+
+                <td>
+                    <input type="button" value="Edit" data-id="@ol.Id" data class="btn btn-primary edit" id="edit" />
+                    <input type="button" value="Delete" data-id="@ol.Id" class="btn btn-danger delete" id="delete" />
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $('.edit').click(function() {
+            var id = $(this).data("id");
+
+            $.ajax({
+                url: "@Url.Action("Edit", "Customer")",
+                type: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                data: { 'id': id },
+                success: function(data) {
+
+                    $("#form0")[0].reset();
+                    $('#modal-title').text("Edit");
+                    $('#Customer_Id').val(data.Id);
+                    $('#Customer_Firstname').val(data.Firstname);
+                    $('#Customer_Lastname').val(data.Lastname);
+                    $('#Customer_MobileNo').val(data.MobileNo);
+                    $('#Customer_City').val(data.City);
+                    $("#Customer_IsActive").prop("checked", data.IsActive);
+                    $('#myModal').modal('show');
+                },
+                error: function(errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+
+        });
+        $('.delete').click(function () {
+            var id = $(this).data("id");
+            var res = confirm("Are You sure want to delete !");
+
+            if (res == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ConfirmDelete", "Customer")/" + id,
+                    success: function (data) {
+                        location.reload();
+                    },
+                error: function (data) {
+                    console.log('Error:', data);
+                }
+            });
+        }
+
+        });
+    </script>
+
+}
+
+

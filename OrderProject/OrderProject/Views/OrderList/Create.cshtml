@@ -1,0 +1,50 @@
+﻿@using OrderProject.Models
+@model OrderProject.ViewModel.OrderListViewModel
+@{
+    ViewBag.Title = "Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="box">
+    <div class="box-body">
+        @using (Html.BeginForm("Create", "OrderList", FormMethod.Post,
+            new { id = "form0", name = "form0" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "Please fix the following errors.")
+
+            
+            <div class="form-group col-md-6">
+                @Html.LabelFor(m => m.PurchaseOrder.Customer.Id)
+                @Html.DropDownListFor(m => m.PurchaseOrder.Customer.Id, new SelectList(Model.Customers, "Id", "Fullname"), "Select Customer", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.PurchaseOrder.Customer.Id)
+            </div>
+            
+           
+            <div class="form-group col-md-3">
+                @Html.LabelFor(m => m.PurchaseOrder.DeliveryDate)
+                <div class="input-group date">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    @Html.TextBoxFor(m => m.PurchaseOrder.DeliveryDate, "{0:MM/dd/yyyy}", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.PurchaseOrder.DeliveryDate)
+                </div>
+            </div>
+
+            <div class="form-group col-md-3">
+                @Html.LabelFor(m => m.PurchaseOrder.Status)
+                @Html.DropDownListFor(m => m.PurchaseOrder.Status, new SelectList(Enum.GetValues(typeof(PurchaseOrder.EnumStatus))),
+                                                                "Select Status", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.PurchaseOrder.Status)
+            </div>
+            
+            <div>
+
+                <button type="submit" class="btn btn-primary" id="btnSave" name="btnSave">Save</button>
+            </div>
+            
+
+        }
+    </div>
+</div>

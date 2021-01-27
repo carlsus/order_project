@@ -1,0 +1,139 @@
+﻿
+@model OrderProject.ViewModel.SKUViewModel
+@{
+    ViewBag.Title = "SKU";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="text-center text-uppercase">List of SKU</h3>
+<p>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Create New</button>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Skus.FirstOrDefault().Name)</th>
+            <th>@Html.DisplayNameFor(m => m.Skus.FirstOrDefault().Code)</th>
+            <th>@Html.DisplayNameFor(m => m.Skus.FirstOrDefault().UnitPrice)</th>
+            <th>@Html.DisplayNameFor(m => m.Skus.FirstOrDefault().IsActive)</th>
+            <th>Action(s)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sku in Model.Skus)
+        {
+            <tr>
+                <td>@sku.Name</td>
+                <td>@sku.Code</td>
+                <td>@sku.UnitPrice</td>
+                <td>@sku.IsActive</td>
+
+                <td>
+                    <input type="button" value="Edit" data-id="@sku.Id" data class="btn btn-primary edit" id="edit" />
+                    <input type="button" value="Delete" data-id="@sku.Id" class="btn btn-danger delete" id="delete" />
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">New </h4>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("Create", "SKU", FormMethod.Post,
+                    new { id = "form0", name = "form0" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.Sku.Id)
+
+                    <div class="form-input">
+                        @Html.LabelFor(m => m.Sku.Name)
+                        @Html.TextBoxFor(m => m.Sku.Name, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Sku.Name)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Sku.Code)
+                        @Html.TextBoxFor(m => m.Sku.Code, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Sku.Code)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Sku.UnitPrice)
+                        @Html.TextBoxFor(m => m.Sku.UnitPrice, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Sku.UnitPrice)
+                    </div>
+                    
+                    @Html.CheckBoxFor(m => m.Sku.IsActive)
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $('.edit').click(function() {
+            var id = $(this).data("id");
+
+            $.ajax({
+                url: "@Url.Action("Edit", "SKU")",
+                type: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                data: { 'id': id },
+                success: function(data) {
+
+                    $("#form0")[0].reset();
+                    $('#modal-title').text("Edit");
+                    $('#Sku_Id').val(data.Id);
+                    $('#Sku_Name').val(data.Name);
+                    $('#Sku_Code').val(data.Code);
+                    $('#Sku_UnitPrice').val(data.UnitPrice);
+                    $("#Sku_IsActive").prop("checked", data.IsActive);
+                    $('#myModal').modal('show');
+                },
+                error: function(errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+
+        });
+        $('.delete').click(function () {
+            var id = $(this).data("id");
+            var res = confirm("Are You sure want to delete !");
+
+            if (res == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ConfirmDelete", "SKU")/" + id,
+                    success: function (data) {
+                        location.reload();
+                    },
+                error: function (data) {
+                    console.log('Error:', data);
+                }
+            });
+        }
+
+        });
+    </script>
+
+}
+
+

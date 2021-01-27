@@ -1,0 +1,144 @@
+﻿@*@model IEnumerable<OrderProject.Models.Customer>*@
+@model OrderProject.ViewModel.CustomerViewModel
+@{
+    ViewBag.Title = "Customers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="text-center text-uppercase">List of Customer</h3>
+<p>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Create New</button>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>@Html.DisplayNameFor(m => m.Customers.FirstOrDefault().Firstname)</th>
+        <th>@Html.DisplayNameFor(m => m.Customers.FirstOrDefault().MobileNo)</th>
+        <th>@Html.DisplayNameFor(m => m.Customers.FirstOrDefault().City)</th>
+        <th>@Html.DisplayNameFor(m => m.Customers.FirstOrDefault().IsActive)</th>
+        <th>Action(s)</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var cust in Model.Customers)
+    {
+        <tr>
+            <td>@cust.Fullname</td>
+            <td>@cust.MobileNo</td>
+            <td>@cust.City</td>
+            <td>@cust.IsActive</td>
+
+            <td>
+                <input type="button" value="Edit" data-id="@cust.Id" data class="btn btn-primary edit" id="edit" />
+                <input type="button" value="Delete" data-id="@cust.Id"  class="btn btn-danger delete" id="delete" />
+
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+                
+
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">New </h4>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("Create", "Customer", FormMethod.Post,
+                    new { id = "form0", name = "form0" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.Customer.Id)
+                    @Html.ValidationSummary(true, "Please fix the following errors.")
+                    <div class="form-input">
+                        @Html.LabelFor(m => m.Customer.Firstname)
+                        @Html.TextBoxFor(m => m.Customer.Firstname, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Customer.Firstname)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Customer.Lastname)
+                        @Html.TextBoxFor(m => m.Customer.Lastname, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Customer.Lastname)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Customer.MobileNo)
+                        @Html.TextBoxFor(m => m.Customer.MobileNo, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Customer.MobileNo)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Customer.City)
+                        @Html.TextBoxFor(m => m.Customer.City, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Customer.City)
+                    </div>
+                    @Html.CheckBoxFor(m => m.Customer.IsActive)
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $('.edit').click(function() {
+            var id = $(this).data("id");
+
+            $.ajax({
+                url: "@Url.Action("Edit", "Customer")",
+                type: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                data: { 'id': id },
+                success: function(data) {
+
+                    $("#form0")[0].reset();
+                    $('#modal-title').text("Edit");
+                    $('#Customer_Id').val(data.Id);
+                    $('#Customer_Firstname').val(data.Firstname);
+                    $('#Customer_Lastname').val(data.Lastname);
+                    $('#Customer_MobileNo').val(data.MobileNo);
+                    $('#Customer_City').val(data.City);
+                    $("#Customer_IsActive").prop("checked", data.IsActive);
+                    $('#myModal').modal('show');
+                },
+                error: function(errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+
+        });
+        $('.delete').click(function () {
+            var id = $(this).data("id");
+            var res = confirm("Are You sure want to delete !");
+
+            if (res == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ConfirmDelete", "Customer")/" + id,
+                    success: function (data) {
+                        location.reload();
+                    },
+                error: function (data) {
+                    console.log('Error:', data);
+                }
+            });
+        }
+            
+        });
+</script>
+
+}
+
+
