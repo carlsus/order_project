@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 using Microsoft.Ajax.Utilities;
 
 namespace OrderProject.Models
@@ -13,12 +15,15 @@ namespace OrderProject.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        
         public string Firstname { get; set; }
         [Required]
+       
         public string Lastname { get; set; }
 
-        //public string Fullname { get; set; }
+
         private string _fullname;
+        //[Remote("IsFullName", "Customer", ErrorMessage = "Customer Already Exist")]
         public string Fullname
         {
             get { return _fullname ?? this.Firstname + ' ' + this.Lastname; }
@@ -28,6 +33,7 @@ namespace OrderProject.Models
         [Required]
         [DataType(DataType.PhoneNumber)]
         [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Invalid Phone Number.")]
+        //[Remote("IsMobileExist", "Customer", ErrorMessage = "Mobile No Already Exist")]
         public string MobileNo { get; set; }
         public string City { get; set; }
         private DateTime _date = DateTime.Now;

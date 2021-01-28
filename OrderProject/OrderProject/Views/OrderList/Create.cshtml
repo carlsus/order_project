@@ -5,46 +5,180 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="box">
-    <div class="box-body">
-        @using (Html.BeginForm("Create", "OrderList", FormMethod.Post,
-            new { id = "form0", name = "form0" }))
-        {
-            @Html.AntiForgeryToken()
-            @Html.ValidationSummary(true, "Please fix the following errors.")
-
-            
-            <div class="form-group col-md-6">
-                @Html.LabelFor(m => m.PurchaseOrder.Customer.Id)
-                @Html.DropDownListFor(m => m.PurchaseOrder.Customer.Id, new SelectList(Model.Customers, "Id", "Fullname"), "Select Customer", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.PurchaseOrder.Customer.Id)
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="invoice-title">
+                <h3>Order</h3>
             </div>
-            
-           
-            <div class="form-group col-md-3">
-                @Html.LabelFor(m => m.PurchaseOrder.DeliveryDate)
-                <div class="input-group date">
-                    <div class="input-group-addon">
-                        <i class="fa fa-calendar"></i>
-                    </div>
-                    @Html.TextBoxFor(m => m.PurchaseOrder.DeliveryDate, "{0:MM/dd/yyyy}", new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.PurchaseOrder.DeliveryDate)
-                </div>
-            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-12">
+                    @using (Html.BeginForm("Create", "OrderList", FormMethod.Post, new { id = "form0", name = "form0" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "Please fix the following errors.")
 
-            <div class="form-group col-md-3">
-                @Html.LabelFor(m => m.PurchaseOrder.Status)
-                @Html.DropDownListFor(m => m.PurchaseOrder.Status, new SelectList(Enum.GetValues(typeof(PurchaseOrder.EnumStatus))),
+                        <div class="form-group col-md-3">
+                            @Html.Label("Customer")
+                            @Html.DropDownList("Customer.Id", new SelectList(Model.Customers, "Id", "Fullname"), "Select Customer", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PurchaseOrder.Customer.Id)
+                        </div>
+
+
+                        <div class="form-group col-md-3">
+                            @Html.Label("Delivery Date")
+                            @Html.TextBox("DeliveryDate","", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PurchaseOrder.DeliveryDate)
+                            
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            @Html.LabelFor(m => m.PurchaseOrder.Status)
+                            @Html.DropDownList("Status", new SelectList(Enum.GetValues(typeof(PurchaseOrder.EnumStatus))),
                                                                 "Select Status", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.PurchaseOrder.Status)
+                            @Html.ValidationMessageFor(m => m.PurchaseOrder.Status)
+                        </div>
+                        
+                    }
+                </div>
+                
             </div>
-            
-            <div>
+        </div>
+    </div>
 
-                <button type="submit" class="btn btn-primary" id="btnSave" name="btnSave">Save</button>
-            </div>
-            
+    <div class="container">
+        <p>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addItem">Add Item</button>
+        </p>
+        <table class="table table-bordered" id="poitems">
+            <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3">
+                    <h5><strong>Total Amoun</strong>t</h5>
 
-        }
+                </td>
+                <td><label id="AmountDue" name="AmountDue"></label> <br /></td>
+            </tr>
+            </tfoot>
+        </table>
+        
+        <div class="form-group">
+            <button type="button" class="btn btn-primary pull-right" id="btnSave" name="btnSave">Save</button>
+        </div>
     </div>
 </div>
+
+<div class="modal fade" id="addItem" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Item</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" >
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Code</th>
+                            <th>Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sku in Model.Skus)
+                        {
+                            <tr>
+                                <td>@sku.Name</td>
+                                <td>@sku.Code</td>
+                                <td>@sku.UnitPrice</td>
+
+                                <td>
+                                    <input type="button" value="Add" data-id="@sku.Id"  data-name="@sku.Name" data-unitprice="@sku.UnitPrice" class="btn btn-primary add" id="add" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var amount_due = 0;
+            var items = {
+                PurchaseOrderDetails: []
+            };
+
+            $('#btnSave').click(function (e) {
+                e.preventDefault();
+                alert('save');
+                items.CustomerId = $('#Customer_Id').val();
+                items.DeliveryDate = $('#DeliveryDate').val();
+                items.Status = $('#Status').val();
+                items.AmountDue = amount_due;
+                console.log(items);
+                $.ajax({
+                    url: "@Url.Action("Save", "OrderList")",
+                    type: "POST",
+                    data: JSON.stringify({ 'items': items }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        
+                    },
+                    error: function (response) {
+                        console.log(response);
+                    },
+                    complete: function () {
+                        location.href = './';
+                    }
+                });
+            });
+            $('.add').click(function() {
+                var id = $(this).data("id");
+                var name = $(this).data("name");
+                var unitprice = $(this).data("unitprice");
+               
+                var itm= {
+                    Sku_Id: id,
+                    Name: name,
+                    Price: unitprice,
+                    Qty: 1,
+                    
+                }
+                amount_due += amount_due;
+                items.PurchaseOrderDetails.push(itm);
+                console.log(items.PurchaseOrderDetails);
+                $("#poitems tbody").append('<tr><td>' + name +'</td><td>'+ 1 +'</td><td>'+ unitprice+'</td><td></td></tr>');
+                alert('Item added');
+                amount_due = 0;
+                $.each(items.PurchaseOrderDetails, function (key, value) {
+                    amount_due += items.PurchaseOrderDetails[key].Price;
+                    
+                });
+                $('#AmountDue').text(amount_due);
+            });
+        })
+
+    </script>
+}
+

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OrderProject.Models;
+using OrderProject.ViewModel;
 
 namespace OrderProject.Repositories
 {
@@ -11,7 +12,7 @@ namespace OrderProject.Repositories
     {
         IEnumerable<PurchaseOrder> GetPurchaseOrders();
         PurchaseOrder GetPOById(int id);
-        void AddPO(PurchaseOrder po);
+        void AddPO(OrderViewModel po);
         void UpdatePO(PurchaseOrder po);
         void DeletePO(int id);
         void Save(); 

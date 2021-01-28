@@ -26,6 +26,11 @@ namespace OrderProject.Repositories
             return _context.Sku.ToList();  
         }
 
+        public IEnumerable<SKU> GetActive()
+        {
+            return _context.Sku.Where(m=>m.IsActive==true).ToList(); 
+        }
+
         public SKU GetSkuById(int id)
         {
             return _context.Sku.Find(id);  

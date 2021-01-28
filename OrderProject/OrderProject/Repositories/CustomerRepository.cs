@@ -25,6 +25,17 @@ namespace OrderProject.Repositories
             return _context.Customers.ToList();  
         }
 
+        public IEnumerable<Customer> SearchMobile(string field)
+        {
+            
+            return _context.Customers.Where(i => i.MobileNo ==field).ToList();
+        }
+
+        public bool SearchFullName(string field)
+        {
+            return !_context.Customers.Any(i => i.Fullname == field);
+        }
+
         public Customer GetCustomerById(int id)
         {
             return _context.Customers.Find(id);  

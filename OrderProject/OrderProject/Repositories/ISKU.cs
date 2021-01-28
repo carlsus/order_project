@@ -10,6 +10,7 @@ namespace OrderProject.Repositories
     public interface ISKU
     {
         IEnumerable<SKU> GetSKU();
+        IEnumerable<SKU> GetActive();
         SKU GetSkuById(int id);
         void AddSku(SKU sku);
         void UpdateSku(SKU sku);

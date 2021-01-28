@@ -18,8 +18,18 @@ namespace OrderProject.Controllers
         public CustomerController()  
         {
             _customer = new CustomerRepository(new OrderContext());  
+        }
+
+        public JsonResult IsMobileExist(string mobile)
+        {
+            
+            return Json(_customer.SearchMobile(mobile).Any(), JsonRequestBehavior.AllowGet);
+        } 
+        public JsonResult IsFullName(string fullname)
+        {
+
+            return Json(_customer.SearchFullName(fullname), JsonRequestBehavior.AllowGet);
         }  
-   
         public CustomerController(ICustomer customer)  
         {
             _customer = customer;  
@@ -36,8 +46,9 @@ namespace OrderProject.Controllers
             return View(viewModel);
             
         }
-
         
+
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Customer customer)

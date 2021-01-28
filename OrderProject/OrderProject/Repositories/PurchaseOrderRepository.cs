@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using OrderProject.Models;
+using OrderProject.ViewModel;
 
 namespace OrderProject.Repositories
 {
@@ -23,7 +24,7 @@ namespace OrderProject.Repositories
         } 
         public IEnumerable<PurchaseOrder> GetPurchaseOrders()
         {
-            return _context.PurchaseOrder.ToList(); 
+            return _context.PurchaseOrder.Include("Customer").ToList(); 
         }
 
         public PurchaseOrder GetPOById(int id)
@@ -31,8 +32,17 @@ namespace OrderProject.Repositories
             return _context.PurchaseOrder.Find(id);  
         }
 
-        public void AddPO(PurchaseOrder po)
+        public void AddPO(OrderViewModel dtoOrder)
         {
+            Customer cust = _context.Customers.Single(c => c.Id == dtoOrder.CustomerId);
+            PurchaseOrder po = new PurchaseOrder
+            {
+                Customer = cust,
+                DeliveryDate = dtoOrder.DeliveryDate,
+                Status = dtoOrder.Status,
+                AmountDue = dtoOrder.AmountDue,
+                PurchaseOrderDetails = dtoOrder.PurchaseOrderDetails
+            };
             _context.PurchaseOrder.Add(po);
             Save();
         }

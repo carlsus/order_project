@@ -151,6 +151,7 @@
     <Compile Include="Repositories\SKURepository.cs" />
     <Compile Include="ViewModel\CustomerViewModel.cs" />
     <Compile Include="ViewModel\OrderListViewModel.cs" />
+    <Compile Include="ViewModel\OrderViewModel.cs" />
     <Compile Include="ViewModel\SKUViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

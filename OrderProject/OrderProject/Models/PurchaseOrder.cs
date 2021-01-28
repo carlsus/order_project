@@ -10,7 +10,7 @@ namespace OrderProject.Models
     public class PurchaseOrder
     {
         public int Id { get; set; }
-        public virtual Customer Customer { get; set; }
+        public  Customer Customer { get; set; }
         [Required]
         public DateTime DeliveryDate { get; set; }
         [Required]

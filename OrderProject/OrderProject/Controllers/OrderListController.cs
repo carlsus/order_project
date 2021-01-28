@@ -14,10 +14,12 @@ namespace OrderProject.Controllers
     {
         private readonly IPurchaseOrder _po;
         private readonly ICustomer _customer;
+        private readonly ISKU _sku;
         public OrderListController()  
         {
             _po = new PurchaseOrderRepository(new OrderContext());  
             _customer=new CustomerRepository(new OrderContext());
+            _sku=new SKURepository(new OrderContext());
         }
 
         public OrderListController(IPurchaseOrder po)  
@@ -28,7 +30,12 @@ namespace OrderProject.Controllers
         public OrderListController(ICustomer customer)
         {
             _customer = customer;
-        }  
+        }
+
+        public OrderListController(ISKU sku)
+        {
+            _sku = sku;
+        }
         // GET: OrderList
         public ActionResult Index()
         {
@@ -42,35 +49,26 @@ namespace OrderProject.Controllers
             var viewModel = new OrderListViewModel
             {
                 Customers = _customer.GetCustomers(),
+                Skus = _sku.GetActive(),
                 PurchaseOrder = new PurchaseOrder()
             };
             return View(viewModel);
-            return View();
+            
         }
         
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(PurchaseOrder po)
+ 
+        public ActionResult Save(OrderViewModel items)
         {
-            
-           
+
             if (ModelState.IsValid)
             {
-                if (po.Id == 0)
-                {
-                    _po.AddPO(po);
-                    _po.Save();
-                    
-                }
-                else
-                {
-                    _po.UpdatePO(po);
-                    _po.Save();
-                }   
-             }
-           
+                _po.AddPO(items);
+                _po.Save(); 
+            }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "OrderList");
+  
         }
 
         [HttpGet]
@@ -94,5 +92,7 @@ namespace OrderProject.Controllers
             _po.Save();
             
         }
+
+        
     }
 }

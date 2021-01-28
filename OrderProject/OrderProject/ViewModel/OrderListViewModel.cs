@@ -10,5 +10,6 @@ namespace OrderProject.ViewModel
     {
         public IEnumerable<Customer> Customers { get; set; }
         public PurchaseOrder PurchaseOrder { get; set; }
+        public IEnumerable<SKU> Skus { get; set; }
     }
 }
